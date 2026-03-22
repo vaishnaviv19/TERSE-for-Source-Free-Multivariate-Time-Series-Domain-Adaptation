@@ -44,7 +44,7 @@ class LoadDataset(Dataset):
 
         return x, y, idx
 
-def data_generator(file_path, domain, dtype, dataSetConfig, hparams):
+def data_generator(file_path, domain, dtype, dataSetConfig, params):
     data_file = torch.load(os.path.join(file_path, f"{dtype}_{domain}.pt"))
 
     data_set = LoadDataset(data_file, dataSetConfig)
@@ -56,6 +56,6 @@ def data_generator(file_path, domain, dtype, dataSetConfig, hparams):
         shuffle = dataSetConfig.shuffle
         drop_last = dataSetConfig.drop_last
     
-    data_loader = torch.utils.data.DataLoader(data_set, batch_size=hparams["batch_size"], shuffle=shuffle, drop_last=drop_last)
+    data_loader = torch.utils.data.DataLoader(data_set, batch_size=params["batch_size"], shuffle=shuffle, drop_last=drop_last)
     return data_loader
 
