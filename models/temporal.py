@@ -81,4 +81,4 @@ class TemporalRestorationNet(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x.reshape(x.size(0), -1, self.num_channels)
         out, _ = self.rnn(x)
-        return out.view(x.size(0), self.num_channels, -1)
+        return out.reshape(x.size(0), self.num_channels, -1)

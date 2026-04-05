@@ -7,6 +7,7 @@ from torchvision import transforms
 class LoadDataset(Dataset):
     def __init__(self, dataset, dataSetConfig):
         super().__init__()
+        self.transform = None
         self.numChannels = dataSetConfig.input_channels
         x_data = dataset["samples"]
 
@@ -21,7 +22,7 @@ class LoadDataset(Dataset):
         y_data = dataset["labels"]
 
         if y_data is not None and isinstance(y_data, np.ndarray):
-            self.labels = torch.from_numpy(y_data)
+            y_data = torch.from_numpy(y_data)
         
         if dataSetConfig.normalize:
             data_mean = torch.mean(x_data, dim=(0,2))
@@ -50,7 +51,7 @@ def data_generator(file_path, domain, dtype, dataSetConfig, params):
     data_set = LoadDataset(data_file, dataSetConfig)
 
     if dtype == "test":
-        suffle = False
+        shuffle = False
         drop_last = False
     else:
         shuffle = dataSetConfig.shuffle
@@ -58,4 +59,6 @@ def data_generator(file_path, domain, dtype, dataSetConfig, params):
     
     data_loader = torch.utils.data.DataLoader(data_set, batch_size=params["batch_size"], shuffle=shuffle, drop_last=drop_last)
     return data_loader
+
+
 
