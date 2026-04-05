@@ -43,7 +43,5 @@ def temporal_patch_masking(x: torch.Tensor, num_splits: int = 8, num_masked: int
     masked_x = masked_patches.contiguous().view(batch_size, num_channels, -1)
     return masked_x, mask
 
-
-# Backward-compatible alias used by existing code paths.
 def masking2(x, num_splits=8, num_masked=4):
     return temporal_patch_masking(x, num_splits=num_splits, num_masked=num_masked)

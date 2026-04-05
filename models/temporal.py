@@ -76,7 +76,7 @@ class TemporalRestorationNet(nn.Module):
         super().__init__()
         self.num_channels = configs.input_channels
         self.hidden_dim = configs.AR_hid_dim
-        self.rnn = nn.LSTM(input_size=self.num_channels, hidden_size=self.hidden_dim)
+        self.rnn = nn.LSTM(input_size=self.num_channels, hidden_size=self.hidden_dim, batch_first=True)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x.reshape(x.size(0), -1, self.num_channels)

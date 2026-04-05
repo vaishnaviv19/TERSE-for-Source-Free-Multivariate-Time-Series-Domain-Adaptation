@@ -28,7 +28,6 @@ class SpatioTemporalBackbone(nn.Module):
         return node_feat, flat_feat
 
 
-# Backward-compatible aliases expected by rest of project.
 TemporalCNN = TemporalConvEncoder
 Graph_Learner = GraphLearner
 Spatial_GNN = SpatialGraphEncoder

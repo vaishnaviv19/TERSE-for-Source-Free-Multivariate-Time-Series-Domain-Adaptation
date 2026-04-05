@@ -6,7 +6,7 @@ from torchvision import transforms
 
 class LoadDataset(Dataset):
     def __init__(self, dataset, dataSetConfig):
-        super.__init__()
+        super().__init__()
         self.numChannels = dataSetConfig.input_channels
         x_data = dataset["samples"]
 
