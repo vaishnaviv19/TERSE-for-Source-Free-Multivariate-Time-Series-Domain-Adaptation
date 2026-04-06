@@ -90,11 +90,11 @@ class TERSE(Algorithm):
                 masked_adj = mask_adj_matrices_edges(src_adj, mask_ratio=self.hparams['gmask_ratio']) 
 
                 src_recovered_temp_feat = self.temporal_verifier(masked_feat.detach())
-                tov_loss = self.mse_loss(src_recovered_temp_feat, src_feat)
+                tov_loss = self.mse_loss(src_recovered_temp_feat, src_feat.detach())
 
-                src_masked_adj_feat, _ = self.feature_extractor.spatial_gnn(src_temp_feat, masked_adj)
+                src_masked_adj_feat, _ = self.feature_extractor.spatial_gnn(src_temp_feat.detach(), masked_adj.detach())
                 src_recovered_graph = self.graph_recover(src_masked_adj_feat.detach(), masked_adj.detach())  # use clearn feats and masked graphs
-                graph_recover_loss = self.mse_loss(src_recovered_graph, src_adj)
+                graph_recover_loss = self.mse_loss(src_recovered_graph, src_adj.detach())
 
                 src_pred = self.classifier(src_flat)
 
@@ -106,7 +106,7 @@ class TERSE(Algorithm):
                 self.pre_optimizer.step()
                 self.recover_optimizer.step()
 
-                losses = {'cls_loss': src_cls_loss.detach().item(), 'tov_loss': tov_loss.detach().item(), 'graph_masking_loss': graph_recover_loss.detach().item()}
+                losses = {'Src_cls_loss': src_cls_loss.detach().item(), 'tov_loss': tov_loss.detach().item(), 'graph_masking_loss': graph_recover_loss.detach().item()}
                 # acculate loss
                 for key, val in losses.items():
                     avg_meter[key].update(val, 32)
@@ -121,9 +121,8 @@ class TERSE(Algorithm):
 
     def update(self, trg_dataloader, avg_meter, logger):
         # defining best and last model
-        best_src_risk = float('inf')
-        best_model = self.network.state_dict()
-        last_model = self.network.state_dict()
+        best_trg_risk = float('inf')
+        best_model = deepcopy(self.network.state_dict())
 
         # freeze both classifier and temporal restoration and spatial rewiring.
         for k, v in self.classifier.named_parameters():
@@ -176,8 +175,8 @@ class TERSE(Algorithm):
 
             self.lr_scheduler.step()
 
-            if (epoch + 1) % 10 == 0 and avg_meter['Src_cls_loss'].avg < best_src_risk:
-                best_src_risk = avg_meter['Src_cls_loss'].avg
+            if (epoch + 1) % 10 == 0 and avg_meter['entropy_loss'].avg < best_trg_risk:
+                best_trg_risk = avg_meter['entropy_loss'].avg
                 best_model = deepcopy(self.network.state_dict())
 
             logger.debug(f'[Epoch : {epoch}/{self.hparams["num_epochs"]}]')
@@ -185,4 +184,5 @@ class TERSE(Algorithm):
                 logger.debug(f'{key}\t: {val.avg:2.4f}')
             logger.debug(f'-------------------------------------')
 
+        last_model = deepcopy(self.network.state_dict())
         return last_model, best_model

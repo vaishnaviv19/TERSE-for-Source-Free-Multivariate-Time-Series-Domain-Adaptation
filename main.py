@@ -195,7 +195,7 @@ def run(args):
 
     logger.info("\n=== Stage 2: Source-free target adaptation ===")
     adapt_avg = defaultdict(AverageMeter)
-    adapt_avg["Src_cls_loss"] = AverageMeter()
+    adapt_avg["entropy_loss"] = AverageMeter()
     last_state, best_state = algorithm.update(target_train_loader, adapt_avg, logger)
 
     chosen_state = best_state if args.use_best else last_state
